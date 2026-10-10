@@ -1,0 +1,15 @@
+/* ---------- first-load preloader ------------------------------------------- */
+
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.site-preloader .tcp-root {
+  font-family: var(--font-plex), ui-monospace, monospace !important;
+}
+
+.site-preloader .tcp-cube {
+  font-family: var(--font-saira), "Oswald", Impact, sans-serif;
+}

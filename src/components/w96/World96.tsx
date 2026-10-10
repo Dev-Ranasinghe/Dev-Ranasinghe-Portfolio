@@ -117,7 +117,7 @@ export default function World96() {
 
         <Marquee />
 
-        <EraButtons onPast={() => leave("/")} onFuture={() => leave("/2006")} />
+        <EraButtons onPast={() => leave("/1986")} onFuture={() => leave("/2006")} />
 
         <div className="w96-grid">
           <nav className="w96-menu" aria-label="Sections">
@@ -204,7 +204,7 @@ export default function World96() {
 
         <Countdown />
 
-        <EraButtons onPast={() => leave("/")} onFuture={() => leave("/2006")} />
+        <EraButtons onPast={() => leave("/1986")} onFuture={() => leave("/2006")} />
 
         <footer className="w96-footer">
           <p>

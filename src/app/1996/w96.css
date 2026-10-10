@@ -96,18 +96,26 @@
 /* ---------- time machine on phones ------------------------------------------- */
 
 @media (max-width: 600px) {
+  /* six equal bevelled keys that always span the screen, whatever the font */
   .yearnav-1996 {
-    font-size: 12px;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: auto;
+    margin: 0 8px;
     gap: 2px;
     padding: 2px;
+    font-size: clamp(10px, 3.4vw, 13px);
   }
 
-  .yearnav-1996 a {
-    padding: 3px 7px;
+  .yearnav-1996 a,
+  .yearnav-1996 a[aria-current] {
+    min-width: 0;
+    padding: 4px 0;
+    text-align: center;
   }
 
   .yearnav-1996 a[aria-current] {
-    padding: 4px 6px 2px 8px;
+    padding: 5px 0 3px 1px;
   }
 }
 
@@ -708,6 +716,11 @@
   cursor: pointer;
 }
 
+.w96-midi > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .w96-midi small {
   display: block;
   font-weight: normal;
@@ -811,8 +824,9 @@
 
 .w96-dont small {
   display: block;
-  font-size: 12px;
+  font-size: clamp(10px, 3.4vw, 12px);
   letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
   margin-bottom: 2px;
 }
 

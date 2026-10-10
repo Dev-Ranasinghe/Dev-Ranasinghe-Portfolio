@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { requestJump } from "@/lib/timejump";
 
 export const ERAS = [
-  { year: 1986, href: "/" },
+  { year: 1986, href: "/1986" },
   { year: 1996, href: "/1996" },
   { year: 2006, href: "/2006" },
   { year: 2016, href: "/2016" },
@@ -19,18 +20,16 @@ export default function YearNav({ era, onTravel }: { era: Era; onTravel?: () => 
   const router = useRouter();
 
   useEffect(() => {
-    // arriving in a new year: clear the warp left by the previous one
-    delete document.documentElement.dataset.warp;
     ERAS.forEach((e) => e.year !== era && router.prefetch(e.href));
   }, [era, router]);
 
-  const travel = (href: string, year: number) => (ev: React.MouseEvent) => {
+  const travel = (href: string, year: number) => (ev: React.MouseEvent<HTMLAnchorElement>) => {
     if (year === era) return;
+    // modified clicks still open the year in a new tab the ordinary way
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
     ev.preventDefault();
     onTravel?.();
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.documentElement.dataset.warp = "out";
-    setTimeout(() => router.push(href), reduced ? 0 : 520);
+    requestJump(href, ev.currentTarget);
   };
 
   return (
@@ -49,12 +48,7 @@ export default function YearNav({ era, onTravel }: { era: Era; onTravel?: () => 
   );
 }
 
-/** Imperative travel for in-page "GO TO 19XX" buttons. */
+/** Imperative travel for in-page "GO TO 19XX" buttons; the jump opens from whatever was pressed. */
 export function useTravel() {
-  const router = useRouter();
-  return (href: string) => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.documentElement.dataset.warp = "out";
-    setTimeout(() => router.push(href), reduced ? 0 : 520);
-  };
+  return (href: string) => requestJump(href);
 }

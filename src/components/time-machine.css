@@ -1,0 +1,426 @@
+/* Time machine: one authored jump between eras.
+   depart  - a portal irises open from the control you pressed and swallows the page
+   transit - light-speed tunnel tinted to the destination, years rolling past
+   arrive  - the tunnel flares and opens from the centre onto the new era */
+
+@property --tm-hole {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.tm {
+  --tm-accent: #ffffff;
+  --tm-tint: none;
+
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--tm-accent) 22%, #000), #000 62%);
+  color: #f4f6f8;
+  font-family: var(--font-plex), ui-monospace, monospace;
+  clip-path: circle(150% at var(--ox, 50%) var(--oy, 50%));
+  cursor: progress;
+}
+
+.tm[data-phase="depart"] {
+  animation: tm-open 700ms cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+.tm[data-phase="arrive"] {
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent calc(var(--tm-hole) - 22%), #000 var(--tm-hole));
+  mask-image: radial-gradient(circle at 50% 50%, transparent calc(var(--tm-hole) - 22%), #000 var(--tm-hole));
+  animation: tm-land 1000ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- tunnel ------------------------------------------------------------ */
+
+.tm-tunnel {
+  position: absolute;
+  inset: 0;
+  filter: var(--tm-tint);
+  animation: tm-rush 5.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* the component's own "WebGL not supported" notice: the gradient behind stands in */
+.tm-tunnel > div {
+  display: none;
+}
+
+.tm[data-phase="arrive"] .tm-tunnel {
+  filter: var(--tm-tint) brightness(2.4);
+  transition: filter 380ms ease-out;
+}
+
+/* ---------- HUD ------------------------------------------------------------- */
+
+.tm-hud {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: clamp(12px, 2.2vh, 22px);
+  width: min(100%, 560px);
+  padding: 24px 20px;
+  text-align: center;
+}
+
+/* a soft dark well behind the readout: the tunnel's brightest sparks sit at its centre */
+.tm-hud::before {
+  content: "";
+  position: absolute;
+  inset: -18% -30%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.35) 55%, transparent);
+  pointer-events: none;
+}
+
+.tm-year {
+  font-size: clamp(68px, 19vw, 172px);
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  text-shadow: 0 0 2px #fff, 0 0 30px var(--tm-accent), 0 0 80px color-mix(in oklab, var(--tm-accent) 55%, transparent);
+}
+
+.tm-route {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: clamp(11px, 1.3vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: rgb(255 255 255 / 0.78);
+}
+
+.tm-route svg {
+  width: 28px;
+  height: 10px;
+  color: var(--tm-accent);
+}
+
+.tm-delta {
+  padding-left: 10px;
+  border-left: 1px solid rgb(255 255 255 / 0.28);
+  color: var(--tm-accent);
+}
+
+/* ---------- arrival card: written in the destination's voice ------------------ */
+
+.tm-card {
+  max-width: min(88vw, 460px);
+  margin-top: 6px;
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.tm-card p {
+  margin: 0;
+}
+
+.tm-card-title {
+  text-wrap: balance;
+}
+
+.tm-card-line {
+  margin-top: 6px !important;
+  text-wrap: pretty;
+}
+
+.tm[data-phase="depart"] .tm-card {
+  opacity: 0;
+}
+
+.tm[data-phase="transit"] .tm-card {
+  animation: tm-card-in 640ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
+}
+
+/* 1986: green phosphor terminal */
+.tm-to-1986 {
+  --tm-accent: #33ff33;
+  --tm-tint: grayscale(1) sepia(1) hue-rotate(65deg) saturate(5);
+}
+
+.tm-to-1986 .tm-card {
+  background: #020602;
+  border: 1px solid #33ff33;
+  color: #33ff33;
+  font-family: var(--font-vt), monospace;
+  font-size: clamp(20px, 1.8vw, 23px);
+  line-height: 1.15;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px rgb(51 255 51 / 0.6);
+  box-shadow: 0 0 24px rgb(51 255 51 / 0.18);
+}
+
+.tm-to-1986 .tm-card-title {
+  font-size: clamp(28px, 2.6vw, 34px);
+}
+
+.tm-to-1986 .tm-card-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.9em;
+  margin-left: 0.2em;
+  vertical-align: -0.1em;
+  background: currentColor;
+  animation: tm-blink 1s steps(1) infinite;
+}
+
+/* 1996: GeoCities, loud and proud */
+.tm-to-1996 {
+  --tm-accent: #ff3df2;
+  --tm-tint: saturate(1.7) contrast(1.1);
+}
+
+.tm-to-1996 .tm-card {
+  background: #0000aa;
+  border: 3px solid #ff3df2;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+.tm-to-1996 .tm-card-title {
+  font-family: var(--tm-comic), "Comic Sans MS", cursive;
+  font-size: clamp(22px, 2vw, 26px);
+  line-height: 1.15;
+  color: #ffff00;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.tm-to-1996 .tm-card-line {
+  font-family: "Times New Roman", Times, serif;
+  font-size: clamp(17px, 1.4vw, 19px);
+  color: #66ff66;
+}
+
+/* 2006: glossy Web 2.0 beta */
+.tm-to-2006 {
+  --tm-accent: #5fa0ec;
+  --tm-tint: grayscale(1) sepia(1) hue-rotate(180deg) saturate(4);
+}
+
+.tm-to-2006 .tm-card {
+  background: linear-gradient(#ffffff, #e6eef8);
+  border: 1px solid #8fb0d8;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 #fff, 0 8px 24px rgb(30 70 130 / 0.4);
+  color: #34507a;
+  font-family: "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+}
+
+.tm-to-2006 .tm-card-title {
+  font-size: clamp(20px, 1.8vw, 23px);
+  font-weight: bold;
+  color: #2f75d6;
+}
+
+.tm-to-2006 .tm-card-title::after {
+  content: "BETA";
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  vertical-align: 3px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: linear-gradient(#ffa24a, #f06a0a);
+}
+
+.tm-to-2006 .tm-card-line {
+  font-size: clamp(14px, 1.2vw, 16px);
+}
+
+/* 2016: flat, one accent, no ornament */
+.tm-to-2016 {
+  --tm-accent: #1abc9c;
+  --tm-tint: grayscale(1) sepia(1) hue-rotate(130deg) saturate(3);
+}
+
+.tm-to-2016 .tm-card {
+  background: #fff;
+  border-top: 4px solid #1abc9c;
+  color: #5d6d7e;
+  font-family: var(--tm-montserrat), "Helvetica Neue", Arial, sans-serif;
+}
+
+.tm-to-2016 .tm-card-title {
+  font-size: clamp(20px, 1.8vw, 23px);
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.tm-to-2016 .tm-card-line {
+  font-size: clamp(14px, 1.2vw, 16px);
+}
+
+/* 2036: dark glass pairing screen */
+.tm-to-2036 {
+  --tm-accent: #7fe0f5;
+  --tm-tint: grayscale(1) sepia(1) hue-rotate(155deg) saturate(3) brightness(1.1);
+}
+
+.tm-to-2036 .tm-card {
+  background: rgb(6 10 12 / 0.84);
+  border: 1px solid #1f2427;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+  color: #9aa4ad;
+  font-family: var(--tm-grotesk), system-ui, sans-serif;
+}
+
+.tm-to-2036 .tm-card-title {
+  font-size: clamp(20px, 1.8vw, 24px);
+  font-weight: 500;
+  color: #7fe0f5;
+}
+
+.tm-to-2036 .tm-card-line {
+  font-size: clamp(15px, 1.3vw, 17px);
+}
+
+/* 2046: white void */
+.tm-to-2046 {
+  --tm-accent: #ffffff;
+  --tm-tint: grayscale(1) brightness(1.5) contrast(1.15);
+}
+
+.tm-to-2046 .tm-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgb(255 255 255 / 0.2);
+  color: #5f5f5f;
+  font-family: var(--tm-orbitron), system-ui, sans-serif;
+}
+
+.tm-to-2046 .tm-card-title {
+  font-size: clamp(17px, 1.6vw, 20px);
+  font-weight: 700;
+  line-height: 1.35;
+  color: #050505;
+}
+
+.tm-to-2046 .tm-card-line {
+  font-size: clamp(13px, 1.2vw, 15px);
+}
+
+/* ---------- the page being left, and the page being reached ------------------ */
+
+html[data-jump="out"] body > *:not(.tm) {
+  animation: tm-page-out 700ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  pointer-events: none;
+}
+
+html[data-jump="in"] body > *:not(.tm) {
+  animation: tm-page-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- keyframes ----------------------------------------------------------- */
+
+@keyframes tm-open {
+  from {
+    clip-path: circle(0% at var(--ox, 50%) var(--oy, 50%));
+  }
+}
+
+@keyframes tm-land {
+  from {
+    --tm-hole: 0%;
+  }
+  to {
+    --tm-hole: 160%;
+  }
+}
+
+@keyframes tm-rush {
+  from {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes tm-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+
+@keyframes tm-page-out {
+  to {
+    opacity: 0;
+    filter: blur(10px) brightness(1.6);
+  }
+}
+
+@keyframes tm-page-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes tm-blink {
+  50% {
+    visibility: hidden;
+  }
+}
+
+@keyframes tm-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes tm-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: no tunnel, no iris, no rolling years. The jump is still announced
+   (destination year and its message), with a plain cross-fade either side. */
+.tm[data-reduced] {
+  clip-path: none;
+  cursor: wait;
+}
+
+.tm[data-reduced][data-phase="depart"] {
+  animation: tm-fade 220ms ease-out both;
+}
+
+.tm[data-reduced][data-phase="arrive"] {
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: tm-fade-out 320ms ease-in both;
+}
+
+.tm[data-reduced] .tm-card,
+.tm[data-reduced][data-phase="transit"] .tm-card {
+  opacity: 1;
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-jump] body > *:not(.tm) {
+    animation: none;
+  }
+
+  html[data-jump="out"] body > *:not(.tm) {
+    opacity: 0;
+  }
+
+  .tm-to-1986 .tm-card-title::after {
+    animation: none;
+  }
+}

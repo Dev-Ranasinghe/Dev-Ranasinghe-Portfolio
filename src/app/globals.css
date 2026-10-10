@@ -185,23 +185,7 @@ html[data-block-cursor] * {
   background-image: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.5) 2px 3px);
 }
 
-/* ---------- time machine (shared) ------------------------------------------ */
-
-html[data-warp] body > * {
-  animation: warp-out 0.52s cubic-bezier(0.7, 0, 0.84, 0) forwards;
-  pointer-events: none;
-}
-
-@keyframes warp-out {
-  0% { transform: none; filter: none; }
-  45% { transform: scale(1, 0.006); filter: brightness(3); }
-  80% { transform: scale(0.004, 0.004); filter: brightness(6); }
-  100% { transform: scale(0, 0); filter: brightness(6); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-warp] body > * { animation: none; opacity: 0; }
-}
+/* ---------- time machine: the jump itself lives in components/time-machine.css -- */
 
 .yearnav-1986 {
   flex: none;
@@ -609,6 +593,7 @@ html[data-warp] body > * {
 
 /* every era's switcher: never wider than the phone it is on */
 .yearnav {
+  box-sizing: border-box;
   max-width: calc(100vw - 16px);
   flex-wrap: wrap;
   justify-content: center;
