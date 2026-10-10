@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Comic_Neue, Montserrat, Orbitron, Space_Grotesk } from "next/font/google";
 import { LightSpeed } from "@/components/ui/light-speed";
+import { haptics } from "@/lib/haptics";
 import { jumpSfx, type Charge } from "@/lib/jumpsfx";
 import { uiHover, uiPress } from "@/lib/sound";
 import { JUMP_EVENT, yearOf, type JumpRequest } from "@/lib/timejump";
@@ -60,6 +61,7 @@ export default function TimeMachine() {
     charge: 0,
     pressed: false,
     raf: 0,
+    nextBuzz: 0,
     sound: null as Charge | null,
     timers: [] as number[],
   });
@@ -124,6 +126,12 @@ export default function TimeMachine() {
       c.charge = Math.min(1, Math.max(0, c.charge + (c.pressed ? dt / HOLD_MS : -dt / (HOLD_MS * 0.4))));
       rootRef.current?.style.setProperty("--charge", c.charge.toFixed(3));
       c.sound?.set(c.charge);
+      // a haptic tick on the same clock as the audio: 0.42s apart, down to 0.08s
+      if (c.pressed && c.nextBuzz < 0) c.nextBuzz = now + 380;
+      if (c.pressed && now >= c.nextBuzz) {
+        haptics.tick(c.charge);
+        c.nextBuzz = now + 420 - c.charge * 340;
+      }
       if (c.charge >= 1) return launch();
       if (!c.pressed && c.charge <= 0) return;
       c.raf = requestAnimationFrame(frame);
@@ -135,6 +143,8 @@ export default function TimeMachine() {
     const c = ctl.current;
     if (c.phase !== "arm" || c.pressed) return;
     c.pressed = true;
+    c.nextBuzz = -1;
+    haptics.press();
     setHolding(true);
     c.sound = jumpSfx.charge();
     c.sound.set(c.charge);
@@ -146,6 +156,7 @@ export default function TimeMachine() {
     if (!c.pressed || c.phase !== "arm") return;
     c.pressed = false;
     setHolding(false);
+    haptics.stop();
     c.sound?.release();
     c.sound = null;
   };
@@ -159,7 +170,7 @@ export default function TimeMachine() {
     c.sound?.commit();
     c.sound = null;
     jumpSfx.launch(t.trip / 1000, c.to > c.from);
-    navigator.vibrate?.(35);
+    haptics.launch();
     setPhase("transit");
     router.push(c.href);
 
@@ -174,6 +185,7 @@ export default function TimeMachine() {
       if ((elapsed >= t.trip && landed) || elapsed >= t.giveUp) {
         if (yearRef.current) yearRef.current.textContent = String(c.to);
         jumpSfx.land();
+        haptics.land();
         setPhase("arrive");
         document.documentElement.dataset.jump = "in";
         c.timers.push(window.setTimeout(() => finish(false), t.arrive));
@@ -192,6 +204,7 @@ export default function TimeMachine() {
     c.sound?.release();
     c.sound = null;
     jumpSfx.stop();
+    haptics.stop();
     setPhase("abort");
     document.documentElement.dataset.jump = "in";
     c.timers.push(window.setTimeout(() => finish(true), (c.reduced ? CALM : FULL).abort));
