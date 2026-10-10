@@ -93,6 +93,24 @@
   box-shadow: var(--bevel-in);
 }
 
+/* ---------- time machine on phones ------------------------------------------- */
+
+@media (max-width: 600px) {
+  .yearnav-1996 {
+    font-size: 12px;
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .yearnav-1996 a {
+    padding: 3px 7px;
+  }
+
+  .yearnav-1996 a[aria-current] {
+    padding: 4px 6px 2px 8px;
+  }
+}
+
 /* ---------- page column ------------------------------------------------------- */
 
 .w96-page {

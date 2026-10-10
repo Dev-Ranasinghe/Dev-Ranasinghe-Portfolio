@@ -30,10 +30,11 @@ export default function World36() {
 
       <main className="w36-main">
         <figure className="w36-figure" aria-hidden="true">
-          <span className="w36-ring w36-ring-outer" />
-          <span className="w36-ring w36-ring-inner" />
+          <span className="w36-wave" />
+          <span className="w36-wave" />
+          <span className="w36-wave" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/w36/xray-head.png" alt="" width={656} height={568} />
+          <img src="/w36/figure.png" alt="" width={440} height={530} />
           <span className="w36-device" />
         </figure>
 

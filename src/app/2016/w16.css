@@ -76,6 +76,17 @@
   color: #fff;
 }
 
+@media (max-width: 600px) {
+  .yearnav-2016 {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  .yearnav-2016 a {
+    padding: 5px 8px;
+  }
+}
+
 /* ---------- header ------------------------------------------------------------ */
 
 .w16-header {

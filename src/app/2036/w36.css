@@ -43,36 +43,37 @@
   letter-spacing: 0;
 }
 
-/* ---------- time machine: near-invisible dark segmented pill ------------------- */
+/* ---------- time machine: dark glass segmented pill ---------------------------- */
 
 .yearnav-2036 {
   display: flex;
-  margin-top: 10px;
-  padding: 4px;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 0.02);
+  margin-top: 12px;
+  padding: 5px;
+  border-radius: 12px;
+  border: 1px solid #1f2427;
+  background: rgb(255 255 255 / 0.015);
   font-family: var(--font-grotesk), sans-serif;
-  font-size: 15px;
+  font-size: clamp(14px, 1.3vw, 18px);
   font-weight: 700;
   letter-spacing: 0.06em;
   z-index: 5;
 }
 
 .yearnav-2036 a {
-  color: #1d2124;
+  color: #f2f4f5;
   text-decoration: none;
-  padding: 6px 22px;
-  border-radius: 6px;
+  padding: 7px clamp(13px, 1.5vw, 23px);
+  border-radius: 7px;
   transition: color 0.25s, background-color 0.25s;
 }
 
 .yearnav-2036 a[aria-current] {
-  background: #121516;
-  color: #2a3033;
+  background: #f4f4f4;
+  color: #050505;
 }
 
 .yearnav-2036 a:not([aria-current]):hover {
-  color: #8d969e;
+  background: rgb(255 255 255 / 0.08);
 }
 
 /* ---------- scan figure ----------------------------------------------------- */
@@ -88,71 +89,80 @@
 }
 
 .w36-figure {
+  --fw: min(440px, 70vw);
   position: relative;
-  width: min(400px, 74vw);
-  aspect-ratio: 656 / 568;
-  margin: clamp(60px, 9vh, 100px) 0 clamp(40px, 6vh, 64px);
-  display: grid;
-  place-items: center;
+  width: var(--fw);
+  aspect-ratio: 440 / 530;
+  margin: calc(var(--fw) * 0.3) 0 32px;
 }
 
 .w36-figure img {
   position: relative;
+  display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 0 18px rgb(110 160 255 / 0.25));
   animation: w36-breathe 6s ease-in-out infinite;
 }
 
-.w36-ring {
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  border-radius: 50%;
-  border: 1px solid rgb(120 190 190 / 0.16);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.w36-ring-outer {
-  width: 128%;
-  aspect-ratio: 1;
-}
-
-.w36-ring-inner {
-  width: 92%;
-  aspect-ratio: 1;
-}
-
-.w36-searching .w36-ring {
-  animation: w36-ping 2.4s ease-out infinite;
-}
-
-.w36-searching .w36-ring-inner {
-  animation-delay: 0.8s;
-}
-
-/* the paired device, sitting over the ear canal of the scan */
+/* glow laid over the disc the figure holds to its ear */
 .w36-device {
   position: absolute;
-  left: 60%;
-  top: 42.5%;
-  width: 7.5%;
+  left: 54.5%;
+  top: 29.2%;
+  width: 9.5%;
   aspect-ratio: 1;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  border: 2px solid rgb(200 225 255 / 0.85);
-  background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.35), rgb(70 110 170 / 0.25) 60%, rgb(10 20 40 / 0.6));
-  box-shadow: 0 0 14px rgb(130 180 255 / 0.55), inset 0 0 6px rgb(160 200 255 / 0.5);
+  pointer-events: none;
 }
 
 .w36-searching .w36-device {
   animation: w36-blink 1.2s ease-in-out infinite;
 }
 
+/* signal waves rolling out from the disc; faster while searching, gone on failure */
+.w36-wave {
+  position: absolute;
+  left: 54.5%;
+  top: 29.2%;
+  width: 150%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgb(127 224 245 / 0.5);
+  box-shadow: 0 0 12px rgb(127 224 245 / 0.12), inset 0 0 12px rgb(127 224 245 / 0.08);
+  transform: translate(-50%, -50%) scale(0.06);
+  opacity: 0;
+  pointer-events: none;
+  animation: w36-wave 4.5s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+}
+
+.w36-wave:nth-of-type(2) {
+  animation-delay: -1.5s;
+}
+
+.w36-wave:nth-of-type(3) {
+  animation-delay: -3s;
+}
+
+.w36-searching .w36-wave {
+  animation-duration: 1.8s;
+  border-color: rgb(127 224 245 / 0.75);
+}
+
+.w36-searching .w36-wave:nth-of-type(2) {
+  animation-delay: -0.6s;
+}
+
+.w36-searching .w36-wave:nth-of-type(3) {
+  animation-delay: -1.2s;
+}
+
+.w36-failed .w36-wave {
+  display: none;
+}
+
 .w36-failed .w36-device {
-  border-color: rgb(240 144 126 / 0.7);
-  box-shadow: 0 0 12px rgb(240 120 100 / 0.35);
+  box-shadow: 0 0 0 2px rgb(240 144 126 / 0.6), 0 0 16px rgb(240 120 100 / 0.4);
 }
 
 /* ---------- panel ------------------------------------------------------------- */
@@ -185,7 +195,7 @@
 
 .w36 h1 sup {
   font-size: 0.3em;
-  vertical-align: 2.2em;
+  vertical-align: 1.6em;
   margin-left: 2px;
 }
 
@@ -227,13 +237,13 @@
   appearance: none;
   border: 0;
   cursor: pointer;
-  min-width: 204px;
-  padding: 22px 40px;
+  min-width: 160px;
+  padding: 16px 34px;
   border-radius: 999px;
   background: linear-gradient(110deg, var(--cyan), var(--violet));
   color: #0b0d12;
   font: inherit;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.02em;
   box-shadow: 0 8px 40px rgb(130 150 245 / 0.2);
@@ -297,22 +307,107 @@
 }
 
 @keyframes w36-breathe {
-  50% { filter: drop-shadow(0 0 26px rgb(110 160 255 / 0.4)); }
+  50% { filter: brightness(1.12) drop-shadow(0 0 18px rgb(110 160 255 / 0.25)); }
 }
 
-@keyframes w36-ping {
-  0% { opacity: 0.9; }
-  100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1.08); }
+@keyframes w36-wave {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.06); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
 @keyframes w36-blink {
-  50% { box-shadow: 0 0 28px rgb(130 220 255 / 0.95), inset 0 0 8px rgb(160 220 255 / 0.8); }
+  50% { box-shadow: 0 0 0 2px rgb(150 220 255 / 0.8), 0 0 26px rgb(130 220 255 / 0.9); }
+}
+
+/* ---------- desktop: the whole flow fits one screen, sized off viewport height -- */
+
+@media (min-width: 761px) {
+  .w36 {
+    height: 100vh;
+    height: 100svh;
+    min-height: 540px;
+  }
+
+  .w36-main {
+    min-height: 0;
+  }
+
+  .w36-figure {
+    --fw: min(460px, 70vw, 40svh);
+    /* free height splits evenly above the head and below the button (main centres) */
+    margin: 0 0 clamp(4px, 1.2vh, 16px);
+  }
+
+  .w36-panel {
+    min-height: 0;
+  }
+
+  .w36-step {
+    margin-bottom: clamp(6px, 1.4vh, 16px);
+    font-size: clamp(11px, 1.8vh, 15px);
+  }
+
+  .w36 h1 {
+    margin-bottom: clamp(6px, 1.6vh, 18px);
+    font-size: clamp(24px, 5.2vh, 46px);
+  }
+
+  .w36 .w36-h-sm {
+    font-size: clamp(22px, 4.2vh, 36px);
+  }
+
+  .w36-copy {
+    margin-bottom: clamp(14px, 3vh, 34px);
+    font-size: clamp(14px, 2.2vh, 20px);
+    line-height: 1.6;
+  }
+
+  .w36-dim {
+    font-size: clamp(13px, 2vh, 17px);
+  }
+
+  .w36-btn {
+    min-width: clamp(130px, 17vh, 160px);
+    padding: clamp(9px, 1.7vh, 16px) clamp(24px, 3.6vh, 34px);
+    font-size: clamp(15px, 2.2vh, 20px);
+  }
+
+  .w36-btn-sm {
+    min-width: clamp(140px, 20vh, 190px);
+    padding: clamp(10px, 2vh, 18px) clamp(24px, 3.8vh, 34px);
+    font-size: clamp(16px, 2.4vh, 20px);
+  }
+
+  .w36-spinner {
+    width: clamp(40px, 7vh, 70px);
+    height: clamp(40px, 7vh, 70px);
+    margin: clamp(6px, 1.6vh, 18px) 0 clamp(12px, 3.4vh, 34px);
+  }
+
+  .w36-alert {
+    width: clamp(40px, 6.6vh, 66px);
+    height: clamp(40px, 6.6vh, 66px);
+    margin-bottom: clamp(10px, 3vh, 30px);
+    font-size: clamp(20px, 3vh, 30px);
+  }
+
+  .w36-footer {
+    padding: clamp(10px, 2.4vh, 28px) 16px clamp(12px, 2.6vh, 28px);
+    font-size: clamp(11px, 1.6vh, 14px);
+  }
+}
+
+/* the brand mark would collide with the centred switcher */
+@media (max-width: 900px) {
+  .w36-brand {
+    position: static;
+    margin-top: 18px;
+  }
 }
 
 @media (max-width: 760px) {
   .w36-brand {
-    position: static;
-    margin-top: 18px;
     font-size: 11px;
   }
 
@@ -327,9 +422,9 @@
   }
 
   .w36-btn {
-    min-width: 170px;
-    padding: 18px 32px;
-    font-size: 20px;
+    min-width: 140px;
+    padding: 14px 28px;
+    font-size: 18px;
   }
 }
 

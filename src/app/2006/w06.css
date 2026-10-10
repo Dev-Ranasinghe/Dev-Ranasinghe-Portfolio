@@ -82,6 +82,16 @@
   background: linear-gradient(#fff, #f3f7fc 50%, #e6eef8 51%, #f6f9fd);
 }
 
+@media (max-width: 600px) {
+  .yearnav-2006 {
+    font-size: 12px;
+  }
+
+  .yearnav-2006 a {
+    padding: 4px 8px;
+  }
+}
+
 /* ---------- page ---------------------------------------------------------------- */
 
 .w06-page {

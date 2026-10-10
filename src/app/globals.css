@@ -606,3 +606,10 @@ html[data-warp] body > * {
     animation: none;
   }
 }
+
+/* every era's switcher: never wider than the phone it is on */
+.yearnav {
+  max-width: calc(100vw - 16px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
