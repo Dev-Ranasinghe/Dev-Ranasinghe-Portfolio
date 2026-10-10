@@ -1,7 +1,7 @@
 // The one door between eras. Anything that travels (the year switcher, in-page
 // "GO TO 19XX" buttons) asks for a jump; the TimeMachine in the root layout runs it.
 
-export type JumpRequest = { href: string; x: number; y: number };
+export type JumpRequest = { href: string; x: number; y: number; opener: HTMLElement | null };
 
 export const JUMP_EVENT = "timemachine:jump";
 
@@ -20,6 +20,7 @@ export function requestJump(href: string, origin?: Element | null) {
   const r = el && el !== document.body ? el.getBoundingClientRect() : null;
   const detail: JumpRequest = {
     href,
+    opener: el instanceof HTMLElement ? el : null,
     x: r ? r.left + r.width / 2 : window.innerWidth / 2,
     y: r ? r.top + r.height / 2 : window.innerHeight / 2,
   };

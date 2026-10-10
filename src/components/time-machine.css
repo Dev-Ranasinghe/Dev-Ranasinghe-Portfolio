@@ -1,7 +1,9 @@
 /* Time machine: one authored jump between eras.
-   depart  - a portal irises open from the control you pressed and swallows the page
-   transit - light-speed tunnel tinted to the destination, years rolling past
-   arrive  - the tunnel flares and opens from the centre onto the new era */
+   arm     - a portal irises open from the year you pressed; read the message, press and hold.
+             --charge (0..1, set per frame) brightens the tunnel, fills the ring, shakes the readout
+   transit - a flash, then the light-speed tunnel at full speed, years rolling past
+   arrive  - the tunnel flares and opens from the centre onto the new era
+   abort   - the portal closes back into the year you pressed */
 
 @property --tm-hole {
   syntax: "<percentage>";
@@ -23,11 +25,36 @@
   color: #f4f6f8;
   font-family: var(--font-plex), ui-monospace, monospace;
   clip-path: circle(150% at var(--ox, 50%) var(--oy, 50%));
-  cursor: progress;
+  cursor: default;
 }
 
-.tm[data-phase="depart"] {
-  animation: tm-open 700ms cubic-bezier(0.7, 0, 0.84, 0) both;
+/* The 1986 terminal hides the system cursor page-wide and draws its own green block,
+   which sits underneath this overlay. The machine always shows the real pointer. */
+html[data-block-cursor] .tm,
+html[data-block-cursor] .tm * {
+  cursor: default !important;
+}
+
+html[data-block-cursor] .tm .tm-hold:not(:disabled),
+html[data-block-cursor] .tm .tm-stay:not(:disabled) {
+  cursor: pointer !important;
+}
+
+/* while travelling there is nothing to press: say so */
+.tm[data-phase="transit"],
+.tm[data-phase="transit"] *,
+html[data-block-cursor] .tm[data-phase="transit"],
+html[data-block-cursor] .tm[data-phase="transit"] * {
+  cursor: progress !important;
+}
+
+.tm[data-phase="arm"] {
+  animation: tm-open 650ms cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+.tm[data-phase="abort"] {
+  pointer-events: none;
+  animation: tm-close 420ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
 }
 
 .tm[data-phase="arrive"] {
@@ -43,7 +70,32 @@
   position: absolute;
   inset: 0;
   filter: var(--tm-tint);
-  animation: tm-rush 5.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* armed: the tunnel idles dim and far away, and wakes as the charge builds */
+.tm[data-phase="arm"] .tm-tunnel,
+.tm[data-phase="abort"] .tm-tunnel {
+  opacity: calc(0.35 + var(--charge) * 0.65);
+  transform: scale(calc(1.3 - var(--charge) * 0.22));
+  filter: var(--tm-tint) brightness(calc(0.6 + var(--charge) * 0.9));
+}
+
+.tm[data-phase="transit"] .tm-tunnel {
+  animation: tm-rush 3.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* the instant of launch */
+.tm-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%, #fff, var(--tm-accent) 45%, transparent 80%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tm[data-phase="transit"] .tm-flash {
+  animation: tm-flash 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* the component's own "WebGL not supported" notice: the gradient behind stands in */
@@ -60,6 +112,7 @@
 
 .tm-hud {
   position: relative;
+  z-index: 2;
   display: grid;
   justify-items: center;
   gap: clamp(12px, 2.2vh, 22px);
@@ -136,12 +189,153 @@
   text-wrap: pretty;
 }
 
-.tm[data-phase="depart"] .tm-card {
+.tm[data-phase="arm"] .tm-card {
+  animation: tm-card-in 640ms cubic-bezier(0.16, 1, 0.3, 1) 280ms both;
+}
+
+/* read before launch: at take-off the message and controls fall away, the years stay */
+.tm[data-phase="transit"] .tm-card,
+.tm[data-phase="transit"] .tm-controls,
+.tm[data-phase="arrive"] .tm-card,
+.tm[data-phase="arrive"] .tm-controls {
+  animation: tm-away 380ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+/* the readout trembles as the charge nears full */
+.tm[data-holding] .tm-hud {
+  animation: tm-shake 70ms steps(2) infinite;
+}
+
+/* ---------- hold control -------------------------------------------------------- */
+
+.tm-controls {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: clamp(4px, 1.4vh, 14px);
+}
+
+.tm[data-phase="arm"] .tm-controls {
+  animation: tm-card-in 640ms cubic-bezier(0.16, 1, 0.3, 1) 420ms both;
+}
+
+.tm-hold {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(84px, 11vh, 104px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / calc(0.06 + var(--charge) * 0.22)), rgb(0 0 0 / 0.55) 70%);
+  color: #fff;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 6px 24px rgb(0 0 0 / 0.5),
+    0 0 calc(10px + var(--charge) * 46px) calc(var(--charge) * 6px) color-mix(in oklab, var(--tm-accent) calc(25% + var(--charge) * 60%), transparent);
+  transform: scale(calc(1 - var(--charge) * 0.06));
+  transition: transform 120ms ease-out;
+}
+
+.tm-hold:focus-visible {
+  outline: 2px solid var(--tm-accent);
+  outline-offset: 6px;
+}
+
+.tm-hold:disabled {
+  cursor: default;
+}
+
+.tm-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.tm-ring circle {
+  fill: none;
+  stroke-width: 3;
+}
+
+.tm-ring-track {
+  stroke: rgb(255 255 255 / 0.18);
+}
+
+.tm-ring-fill {
+  stroke: var(--tm-accent);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--charge));
+  filter: drop-shadow(0 0 4px var(--tm-accent));
+}
+
+.tm-glyph {
+  width: 38%;
+  height: 38%;
+  color: var(--tm-accent);
+  filter: drop-shadow(0 0 6px var(--tm-accent));
+}
+
+.tm-hint {
+  display: grid;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.tm-hint > span {
+  grid-area: 1 / 1;
+  transition: opacity 160ms ease-out;
+}
+
+.tm-hint-busy,
+.tm[data-holding] .tm-hint-idle {
   opacity: 0;
 }
 
-.tm[data-phase="transit"] .tm-card {
-  animation: tm-card-in 640ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
+.tm[data-holding] .tm-hint-busy {
+  opacity: 1;
+  color: var(--tm-accent);
+}
+
+.tm-stay {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.66);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgb(255 255 255 / 0.3);
+  cursor: pointer;
+  transition: color 150ms ease-out;
+}
+
+.tm-stay:hover,
+.tm-stay:focus-visible {
+  color: #fff;
+  text-decoration-color: currentColor;
+}
+
+.tm-stay:focus-visible {
+  outline: 2px solid var(--tm-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* 1986: green phosphor terminal */
@@ -317,7 +511,7 @@
 /* ---------- the page being left, and the page being reached ------------------ */
 
 html[data-jump="out"] body > *:not(.tm) {
-  animation: tm-page-out 700ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  animation: tm-page-out 650ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
   pointer-events: none;
 }
 
@@ -342,9 +536,42 @@ html[data-jump="in"] body > *:not(.tm) {
   }
 }
 
+@keyframes tm-close {
+  to {
+    clip-path: circle(0% at var(--ox, 50%) var(--oy, 50%));
+  }
+}
+
 @keyframes tm-rush {
   from {
-    transform: scale(1.35);
+    transform: scale(1.08);
+    filter: var(--tm-tint) brightness(2);
+  }
+}
+
+@keyframes tm-flash {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes tm-away {
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+    filter: blur(6px);
+  }
+}
+
+@keyframes tm-shake {
+  0% {
+    translate: calc(var(--charge) * var(--charge) * -3px) calc(var(--charge) * var(--charge) * 2px);
+  }
+  50% {
+    translate: calc(var(--charge) * var(--charge) * 3px) calc(var(--charge) * var(--charge) * -2px);
   }
 }
 
@@ -392,11 +619,18 @@ html[data-jump="in"] body > *:not(.tm) {
    (destination year and its message), with a plain cross-fade either side. */
 .tm[data-reduced] {
   clip-path: none;
-  cursor: wait;
 }
 
-.tm[data-reduced][data-phase="depart"] {
+.tm[data-reduced][data-phase="arm"] {
   animation: tm-fade 220ms ease-out both;
+}
+
+.tm[data-reduced][data-phase="abort"] {
+  animation: tm-fade-out 200ms ease-in forwards;
+}
+
+.tm[data-reduced][data-holding] .tm-hud {
+  animation: none;
 }
 
 .tm[data-reduced][data-phase="arrive"] {
@@ -406,9 +640,13 @@ html[data-jump="in"] body > *:not(.tm) {
 }
 
 .tm[data-reduced] .tm-card,
-.tm[data-reduced][data-phase="transit"] .tm-card {
-  opacity: 1;
+.tm[data-reduced] .tm-controls {
   animation: none;
+}
+
+.tm[data-reduced][data-phase="transit"] .tm-card,
+.tm[data-reduced][data-phase="transit"] .tm-controls {
+  animation: tm-fade-out 200ms ease-in forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

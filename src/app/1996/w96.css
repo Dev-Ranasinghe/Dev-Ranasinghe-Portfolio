@@ -93,6 +93,14 @@
   box-shadow: var(--bevel-in);
 }
 
+/* ---------- time machine on phones and tablets: scrolls away with the page ----- */
+
+@media (max-width: 900px) {
+  .yearnav-1996 {
+    position: static;
+  }
+}
+
 /* ---------- time machine on phones ------------------------------------------- */
 
 @media (max-width: 600px) {

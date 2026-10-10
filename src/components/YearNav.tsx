@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { uiHover, uiPress } from "@/lib/sound";
 import { requestJump } from "@/lib/timejump";
 
 export const ERAS = [
@@ -28,6 +29,7 @@ export default function YearNav({ era, onTravel }: { era: Era; onTravel?: () => 
     // modified clicks still open the year in a new tab the ordinary way
     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
     ev.preventDefault();
+    uiPress();
     onTravel?.();
     requestJump(href, ev.currentTarget);
   };
@@ -39,6 +41,7 @@ export default function YearNav({ era, onTravel }: { era: Era; onTravel?: () => 
           key={e.year}
           href={e.href}
           onClick={travel(e.href, e.year)}
+          onPointerEnter={(ev) => ev.pointerType === "mouse" && e.year !== era && uiHover()}
           aria-current={e.year === era ? "page" : undefined}
         >
           {e.year}

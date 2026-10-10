@@ -683,7 +683,20 @@
 /* ---------- small screens --------------------------------------------------------- */
 
 @media (max-width: 760px) {
-  .w16-header {
+  /* the switcher scrolls away on phones; one centred row, not a half-width fixed box */
+  .yearnav-2016 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: max-content;
+    margin: 0 auto;
+    transform: none;
+  }
+
+  /* the header still sticks, but slides up over the space the switcher used */
+  .w16-header,
+  .w16-header.is-scrolled {
+    top: -28px;
     padding: 36px 16px 12px;
     flex-wrap: wrap;
   }
