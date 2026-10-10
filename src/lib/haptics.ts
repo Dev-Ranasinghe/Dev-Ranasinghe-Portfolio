@@ -1,4 +1,5 @@
 // Time-machine haptics. Android browsers get full patterns through the Vibration API.
+// Pulses never go below ~30ms: most phone motors need that long to spin up enough to feel.
 // iOS Safari has no Vibration API, but iOS 18 plays a system haptic when a switch-style
 // checkbox toggles, so single taps there go through a hidden one (patterns degrade to
 // their first beat). Everywhere else this is a silent no-op.
@@ -34,12 +35,12 @@ function buzz(pattern: number | number[]) {
 export const haptics = {
   /** Finger lands on the ring. */
   press() {
-    buzz(12);
+    buzz(35);
   },
 
   /** One clock tick while charging; Android only, iOS would rattle the system haptic. */
   tick(strength: number) {
-    if (canVibrate()) navigator.vibrate(Math.round(6 + strength * 10));
+    if (canVibrate()) navigator.vibrate(Math.round(28 + strength * 22));
   },
 
   /**
@@ -48,20 +49,20 @@ export const haptics = {
    */
   launch() {
     if (!canVibrate()) return iosTap();
-    const pattern = [70, 40, 120];
-    let on = 34;
-    let off = 70;
-    while (on > 6) {
+    const pattern = [110, 60, 220];
+    let on = 60;
+    let off = 110;
+    while (on > 30) {
       pattern.push(off, on);
-      off = Math.max(18, off * 0.9);
-      on *= 0.955;
+      off = Math.max(40, off * 0.9);
+      on *= 0.97;
     }
     navigator.vibrate(pattern.map(Math.round));
   },
 
   /** Touchdown: a soft double tap. */
   land() {
-    buzz([18, 60, 30]);
+    buzz([45, 90, 70]);
   },
 
   /** Let go early, or stayed: stop whatever is running. */
