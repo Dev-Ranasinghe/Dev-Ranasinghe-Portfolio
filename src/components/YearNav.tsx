@@ -8,6 +8,8 @@ export const ERAS = [
   { year: 1996, href: "/1996" },
   { year: 2006, href: "/2006" },
   { year: 2016, href: "/2016" },
+  { year: 2036, href: "/2036" },
+  { year: 2046, href: "/2046" },
 ] as const;
 
 type Era = (typeof ERAS)[number]["year"];

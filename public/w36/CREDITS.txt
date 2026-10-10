@@ -1,0 +1,3 @@
+xray-head.png <- "X-ray of the human skull (side view).jpg" by Nyechologist, CC BY 3.0
+                 https://commons.wikimedia.org/wiki/File:X-ray_of_the_human_skull_(side_view).jpg
+                 Modified: cropped, scanner line artefacts removed, tinted blue, alpha-masked with glow.

@@ -1,0 +1,342 @@
+/* 2036: a single pairing screen. Black glass, one glowing scan, one gradient pill. */
+
+.w36 {
+  --ink: #e9eef2;
+  --muted: #9aa4ad;
+  --dim: #6b747c;
+  --cyan: #7fe0f5;
+  --violet: #9b7bf3;
+  --err: #f0907e;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    radial-gradient(ellipse 55% 60% at 50% 38%, rgb(20 52 56 / 0.35), transparent 70%),
+    radial-gradient(ellipse at 50% 50%, #050909, #000 80%);
+  color: var(--ink);
+  font-family: var(--font-grotesk), "Space Grotesk", system-ui, sans-serif;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+.w36 :focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+.w36-brand {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  margin: 0;
+  font-family: var(--font-spacemono), monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #8d969e;
+}
+
+.w36-brand sup {
+  font-size: 0.6em;
+  letter-spacing: 0;
+}
+
+/* ---------- time machine: near-invisible dark segmented pill ------------------- */
+
+.yearnav-2036 {
+  display: flex;
+  margin-top: 10px;
+  padding: 4px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.02);
+  font-family: var(--font-grotesk), sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  z-index: 5;
+}
+
+.yearnav-2036 a {
+  color: #1d2124;
+  text-decoration: none;
+  padding: 6px 22px;
+  border-radius: 6px;
+  transition: color 0.25s, background-color 0.25s;
+}
+
+.yearnav-2036 a[aria-current] {
+  background: #121516;
+  color: #2a3033;
+}
+
+.yearnav-2036 a:not([aria-current]):hover {
+  color: #8d969e;
+}
+
+/* ---------- scan figure ----------------------------------------------------- */
+
+.w36-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.w36-figure {
+  position: relative;
+  width: min(400px, 74vw);
+  aspect-ratio: 656 / 568;
+  margin: clamp(60px, 9vh, 100px) 0 clamp(40px, 6vh, 64px);
+  display: grid;
+  place-items: center;
+}
+
+.w36-figure img {
+  position: relative;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 18px rgb(110 160 255 / 0.25));
+  animation: w36-breathe 6s ease-in-out infinite;
+}
+
+.w36-ring {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  border-radius: 50%;
+  border: 1px solid rgb(120 190 190 / 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.w36-ring-outer {
+  width: 128%;
+  aspect-ratio: 1;
+}
+
+.w36-ring-inner {
+  width: 92%;
+  aspect-ratio: 1;
+}
+
+.w36-searching .w36-ring {
+  animation: w36-ping 2.4s ease-out infinite;
+}
+
+.w36-searching .w36-ring-inner {
+  animation-delay: 0.8s;
+}
+
+/* the paired device, sitting over the ear canal of the scan */
+.w36-device {
+  position: absolute;
+  left: 60%;
+  top: 42.5%;
+  width: 7.5%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgb(200 225 255 / 0.85);
+  background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.35), rgb(70 110 170 / 0.25) 60%, rgb(10 20 40 / 0.6));
+  box-shadow: 0 0 14px rgb(130 180 255 / 0.55), inset 0 0 6px rgb(160 200 255 / 0.5);
+}
+
+.w36-searching .w36-device {
+  animation: w36-blink 1.2s ease-in-out infinite;
+}
+
+.w36-failed .w36-device {
+  border-color: rgb(240 144 126 / 0.7);
+  box-shadow: 0 0 12px rgb(240 120 100 / 0.35);
+}
+
+/* ---------- panel ------------------------------------------------------------- */
+
+.w36-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 300px;
+  animation: w36-in 0.5s ease-out both;
+}
+
+.w36-step {
+  margin: 0 0 16px;
+  font-family: var(--font-spacemono), monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.w36 h1 {
+  margin: 0 0 18px;
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.w36 h1 sup {
+  font-size: 0.3em;
+  vertical-align: 2.2em;
+  margin-left: 2px;
+}
+
+.w36 .w36-h-sm {
+  font-size: clamp(26px, 2.6vw, 36px);
+}
+
+.w36-grad {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.w36-copy {
+  margin: 0 0 34px;
+  max-width: 760px;
+  font-size: clamp(16px, 1.3vw, 20px);
+  line-height: 1.75;
+  color: #b9c1c8;
+}
+
+.w36-narrow {
+  max-width: 500px;
+  line-height: 1.65;
+}
+
+.w36-dim {
+  font-size: 17px;
+  color: var(--dim);
+}
+
+.w36-err {
+  color: var(--err);
+}
+
+.w36-btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  min-width: 204px;
+  padding: 22px 40px;
+  border-radius: 999px;
+  background: linear-gradient(110deg, var(--cyan), var(--violet));
+  color: #0b0d12;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 40px rgb(130 150 245 / 0.2);
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.w36-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 50px rgb(130 150 245 / 0.35);
+}
+
+.w36-btn:active {
+  transform: scale(0.98);
+}
+
+.w36-btn-sm {
+  min-width: 190px;
+  padding: 18px 34px;
+  font-size: 20px;
+}
+
+.w36-spinner {
+  width: 70px;
+  height: 70px;
+  margin: 18px 0 34px;
+  border-radius: 50%;
+  border: 3px solid #1b2a2e;
+  border-top-color: var(--cyan);
+  animation: w36-spin 1s linear infinite;
+}
+
+.w36-alert {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  margin: 0 0 30px;
+  border-radius: 50%;
+  border: 2px solid rgb(240 144 126 / 0.55);
+  color: var(--err);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.w36-footer {
+  padding: 40px 16px 28px;
+  font-family: var(--font-spacemono), monospace;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4d555b;
+}
+
+@keyframes w36-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes w36-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes w36-breathe {
+  50% { filter: drop-shadow(0 0 26px rgb(110 160 255 / 0.4)); }
+}
+
+@keyframes w36-ping {
+  0% { opacity: 0.9; }
+  100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes w36-blink {
+  50% { box-shadow: 0 0 28px rgb(130 220 255 / 0.95), inset 0 0 8px rgb(160 220 255 / 0.8); }
+}
+
+@media (max-width: 760px) {
+  .w36-brand {
+    position: static;
+    margin-top: 18px;
+    font-size: 11px;
+  }
+
+  .yearnav-2036 {
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .yearnav-2036 a {
+    padding: 5px 10px;
+  }
+
+  .w36-btn {
+    min-width: 170px;
+    padding: 18px 32px;
+    font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w36 *,
+  .w36 *::before,
+  .w36 *::after {
+    animation: none !important;
+  }
+}
