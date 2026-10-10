@@ -1,26 +1,608 @@
 @import "tailwindcss";
 
+/* P1 phosphor on a black tube. The world is monochrome by design. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --tube: #020602;
+  --tube-edge: #000;
+  --bezel: #0b0d0b;
+  --phosphor: #33ff33;
+  --phosphor-hi: #b6ffb0;
+  --phosphor-mid: #22c922;
+  --phosphor-dim: #1c9a1c;
+  --phosphor-faint: rgb(51 255 51 / 0.12);
+  --error: #7dff6a;
+  --glow: 0 0 2px rgb(51 255 51 / 0.9), 0 0 9px rgb(51 255 51 / 0.45);
+  --glow-hi: 0 0 3px rgb(182 255 176 / 0.9), 0 0 14px rgb(51 255 51 / 0.6);
+  --step: clamp(19px, 0.85rem + 0.75vw, 28px);
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+html,
+body {
+  margin: 0;
+  background: var(--bezel);
+}
+
+.crt {
+  color: var(--phosphor);
+  font-family: var(--font-vt), "Courier New", monospace;
+  font-size: var(--step);
+  line-height: 1.3;
+  -webkit-font-smoothing: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+.crt ::selection {
+  background: var(--phosphor);
+  color: var(--tube);
+  text-shadow: none;
+}
+
+.crt :focus-visible {
+  outline: 1px dashed var(--phosphor);
+  outline-offset: 3px;
+}
+
+html[data-block-cursor] * {
+  cursor: none !important;
+}
+
+/* ---------- tube ---------------------------------------------------------- */
+
+.crt {
+  position: fixed;
+  inset: 0;
+  padding: clamp(0px, 1.2vw, 18px);
+  background: var(--bezel);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: clamp(10px, 2.2vw, 28px);
+  background: radial-gradient(ellipse at 50% 45%, #061206 0%, var(--tube) 60%, var(--tube-edge) 100%);
+  box-shadow:
+    inset 0 0 70px rgb(0 0 0 / 0.95),
+    inset 0 0 6px rgb(51 255 51 / 0.12),
+    0 0 0 1px #1a1d1a;
+  text-shadow: var(--glow);
+  animation: flicker 0.12s steps(2) infinite;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  50% { opacity: 1; }
+  100% { opacity: 0.985; }
+}
+
+.screen.is-tearing > .session,
+.screen.is-tearing > .dialer,
+.screen.is-tearing > .status {
+  animation: jitter 0.09s steps(3) infinite;
+  filter: brightness(1.25) contrast(1.1);
+  text-shadow:
+    var(--glow),
+    -3px 0 rgb(51 255 51 / 0.35),
+    3px 0 rgb(182 255 176 / 0.2);
+}
+
+@keyframes jitter {
+  0% { transform: translateX(0) skewX(0); }
+  33% { transform: translateX(2px) skewX(-0.6deg); }
+  66% { transform: translateX(-3px) skewX(0.4deg); }
+  100% { transform: translateX(1px); }
+}
+
+/* horizontal sync tear: a band that shoves the image sideways */
+.tear {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: clamp(10px, 4vh, 46px);
+  z-index: 4;
+  pointer-events: none;
+  backdrop-filter: brightness(1.9) blur(0.6px);
+  transform: translateX(var(--shift));
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(51 255 51 / 0.07) 0 1px,
+    transparent 1px 3px
+  );
+  border-top: 1px solid rgb(51 255 51 / 0.25);
+}
+
+.fx-scanlines,
+.fx-roll,
+.fx-vignette {
+  position: fixed;
+  inset: clamp(0px, 1.2vw, 18px);
+  border-radius: clamp(10px, 2.2vw, 28px);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fx-scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 0 2px,
+    rgb(0 0 0 / 0.38) 2px 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+.fx-roll {
+  overflow: hidden;
+}
+
+.fx-roll::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18vh;
+  top: -20vh;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(51 255 51 / 0.045) 45%,
+    rgb(51 255 51 / 0.09) 50%,
+    rgb(51 255 51 / 0.045) 55%,
+    transparent
+  );
+  animation: roll 7.5s linear infinite;
+}
+
+@keyframes roll {
+  to { transform: translateY(140vh); }
+}
+
+.fx-vignette {
+  background:
+    radial-gradient(ellipse at center, transparent 58%, rgb(0 0 0 / 0.55) 100%),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.025), transparent 18%);
+}
+
+.block-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0.55em;
+  height: 1.05em;
+  background: var(--phosphor);
+  box-shadow: var(--glow);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: screen;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.5) 2px 3px);
+}
+
+/* ---------- time machine (shared) ------------------------------------------ */
+
+html[data-warp] body > * {
+  animation: warp-out 0.52s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  pointer-events: none;
+}
+
+@keyframes warp-out {
+  0% { transform: none; filter: none; }
+  45% { transform: scale(1, 0.006); filter: brightness(3); }
+  80% { transform: scale(0.004, 0.004); filter: brightness(6); }
+  100% { transform: scale(0, 0); filter: brightness(6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-warp] body > * { animation: none; opacity: 0; }
+}
+
+.yearnav-1986 {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin: clamp(10px, 2.4vh, 22px) auto 0;
+  border: 1px solid var(--phosphor-dim);
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+}
+
+.yearnav-1986 a {
+  color: var(--phosphor-dim);
+  text-decoration: none;
+  padding: 0.15em 0.9em;
+}
+
+.yearnav-1986 a + a {
+  border-left: 1px solid var(--phosphor-dim);
+}
+
+.yearnav-1986 a[aria-current] {
+  background: var(--phosphor);
+  color: var(--tube);
+  text-shadow: none;
+}
+
+.yearnav-1986 a:not([aria-current]):hover {
+  color: var(--phosphor-hi);
+  text-shadow: var(--glow-hi);
+}
+
+/* ---------- status strip --------------------------------------------------- */
+
+.status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5em 2.2em;
+  padding: clamp(12px, 3vh, 36px) 16px clamp(10px, 2vh, 20px);
+  letter-spacing: 0.04em;
+}
+
+.dim {
+  color: var(--phosphor-dim);
+  text-shadow: 0 0 6px rgb(51 255 51 / 0.25);
+}
+
+.sound-toggle {
+  font: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  letter-spacing: inherit;
+  background: transparent;
+  border: 1px solid var(--phosphor);
+  box-shadow: var(--glow);
+  padding: 0.1em 0.55em;
+}
+
+.sound-toggle:hover {
+  background: var(--phosphor);
+  color: var(--tube);
+  text-shadow: none;
+}
+
+.sound-toggle[aria-pressed="false"] {
+  border-style: dashed;
+  color: var(--phosphor-dim);
+  box-shadow: none;
+}
+
+/* ---------- dialer (first viewport) ----------------------------------------- */
+
+.dialer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 16px 10vh;
+  gap: 0.15em;
+}
+
+.dialer-title {
+  margin: 0 0 0.5em;
+  font-size: clamp(1.4rem, 1rem + 2.4vw, 2.6rem);
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  color: var(--phosphor-hi);
+  text-shadow: var(--glow-hi);
+}
+
+.dialer-spec {
+  margin: 0;
+  color: var(--phosphor-mid);
+  letter-spacing: 0.05em;
+}
+
+.connect {
+  margin: 1.4em 0 0.8em;
+  font: inherit;
+  font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.3rem);
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.35em 1.6em;
+  border: 0;
+  color: var(--tube);
+  text-shadow: none;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.18) 2px 3px),
+    var(--phosphor);
+  box-shadow: 0 0 6px rgb(51 255 51 / 0.8), 0 0 28px rgb(51 255 51 / 0.35);
+  transition: box-shadow 0.25s ease-out, background-color 0.25s ease-out;
+}
+
+.connect:hover,
+.connect:focus-visible {
+  background-color: var(--phosphor-hi);
+  box-shadow: 0 0 8px rgb(182 255 176 / 0.95), 0 0 46px rgb(51 255 51 / 0.55);
+}
+
+.connect:active {
+  transform: translateY(1px);
+}
+
+.connect-arrow {
+  width: 0;
+  height: 0;
+  border-top: 0.32em solid transparent;
+  border-bottom: 0.32em solid transparent;
+  border-left: 0.42em solid currentColor;
+}
+
+.connect-small {
+  font-size: 1.1em;
+  padding: 0.2em 1em;
+}
+
+.blink {
+  animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- session --------------------------------------------------------- */
+
+.session {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px clamp(24px, 8vh, 90px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--phosphor-dim) transparent;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 2.2em);
+}
+
+.session::-webkit-scrollbar {
+  width: 8px;
+}
+.session::-webkit-scrollbar-thumb {
+  background: var(--phosphor-dim);
+}
+
+.output,
+.prompt,
+.hints,
+.redial {
+  width: 100%;
+  max-width: 64ch;
+  margin-inline: auto;
+}
+
+.output {
+  padding-top: clamp(8px, 3vh, 36px);
+}
+
+.ln {
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1.3em;
+}
+
+.ln-bright {
+  color: var(--phosphor-hi);
+  text-shadow: var(--glow-hi);
+}
+
+.ln-dim {
+  color: var(--phosphor-dim);
+  text-shadow: 0 0 6px rgb(51 255 51 / 0.25);
+}
+
+.ln-error {
+  color: var(--error);
+}
+
+.ln-rule {
+  color: var(--phosphor-mid);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+  margin-top: 0.2em;
+}
+
+.ln a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.2em;
+}
+
+.ln a:hover {
+  background: var(--phosphor);
+  color: var(--tube);
+  text-shadow: none;
+  text-decoration: none;
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.12em;
+  background: var(--phosphor);
+  box-shadow: var(--glow);
+  animation: blink 1s steps(1) infinite;
+}
+
+/* main menu box */
+.menu {
+  margin: 1.1em 0 1em;
+  border: 1px dashed var(--phosphor);
+  box-shadow: 0 0 6px rgb(51 255 51 / 0.35), inset 0 0 6px rgb(51 255 51 / 0.2);
+  outline: 1px dashed rgb(51 255 51 / 0.4);
+  outline-offset: 3px;
+}
+
+.menu-title {
+  text-align: center;
+  padding: 0.25em 0;
+  border-bottom: 1px dashed var(--phosphor);
+  color: var(--phosphor-hi);
+  text-shadow: var(--glow-hi);
+}
+
+.menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5em 0.4em 0.6em;
+  min-height: 1.3em;
+}
+
+.menu button {
+  font: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0.05em 0.6em;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  white-space: pre;
+}
+
+.menu button span:last-child {
+  white-space: normal;
+}
+
+.menu button:not(:disabled):hover,
+.menu button:focus-visible {
+  background: var(--phosphor);
+  color: var(--tube);
+  text-shadow: none;
+  outline: none;
+}
+
+.menu-key {
+  color: var(--phosphor-hi);
+}
+
+.menu button:hover .menu-key,
+.menu button:focus-visible .menu-key {
+  color: inherit;
+}
+
+.menu-dots {
+  color: var(--phosphor-dim);
+}
+
+/* prompt */
+.prompt {
+  display: flex;
+  gap: 0.6em;
+  align-items: baseline;
+  margin-top: 0.6em;
+}
+
+.prompt-label {
+  flex: none;
+}
+
+.prompt-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.prompt-field input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  font: inherit;
+  font-size: max(16px, 1em); /* stops iOS zoom-on-focus */
+  color: transparent;
+  caret-color: transparent;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.prompt-echo {
+  pointer-events: none;
+  white-space: pre;
+  text-transform: uppercase;
+  display: inline-block;
+  min-height: 1.3em;
+}
+
+.prompt-field:focus-within {
+  outline: none;
+}
+
+.hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1em 0.2em;
+  margin-top: 0.7em;
+  color: var(--phosphor-dim);
+}
+
+.hint {
+  font: inherit;
+  color: var(--phosphor-dim);
+  text-shadow: 0 0 6px rgb(51 255 51 / 0.25);
+  background: transparent;
+  border: 0;
+  padding: 0.05em 0.35em;
+}
+
+.hint:not(:last-child)::after {
+  content: " |";
+  color: rgb(51 255 51 / 0.35);
+}
+
+.hint:hover,
+.hint:focus-visible {
+  color: var(--phosphor-hi);
+  text-shadow: var(--glow-hi);
+}
+
+.redial {
+  margin-top: 1.5em;
+  text-align: center;
+}
+
+/* ---------- small screens --------------------------------------------------- */
+
+@media (max-width: 560px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --step: 19px;
+  }
+  .status {
+    justify-content: space-between;
+    gap: 0.5em 1em;
+  }
+  .hint {
+    padding: 0.3em 0.4em; /* larger tap targets */
+  }
+  .menu button {
+    padding: 0.25em 0.4em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .fx-roll::after,
+  .blink,
+  .cursor {
+    animation: none;
+  }
 }

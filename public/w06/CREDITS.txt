@@ -1,0 +1,10 @@
+Period ad artwork for the 2006 page, recovered from the Internet Archive (https://web.archive.org).
+All trademarks belong to their owners (Apple Inc., Microsoft Corp.); used here as era artefacts / parody.
+
+ipod-nano-ad.jpg   <- composited from Apple's 7 Sep 2005 apple.com homepage hero:
+                      http://images.apple.com/home/2005/images/ipodnanohand20050907.jpg
+                      http://images.apple.com/home/2005/images/ipodnanotitle20050907.gif
+wlm-wordmark.png   <- http://ads.msn.com/ads/pronws/ideas/en/us/WLMes_Beta.gif (Dec 2006, "Beta" tag cropped)
+wlm-buddies.png    <- Windows Live Messenger 8 icon (en.wikipedia File:Windows_Live_Messenger_icon.png)
+wlm-button-top.png <- http://get.live.com/Images/GreenButtonTop.gif (2006)
+wlm-button-bot.png <- http://get.live.com/Images/GreenButtonBottom.gif (2006)
